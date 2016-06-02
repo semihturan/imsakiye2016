@@ -1,13 +1,18 @@
 /**
  * Site header
  */
-.site-header {
-    border-top: 5px solid $grey-color-dark;
-    border-bottom: 1px solid $grey-color-light;
-    min-height: 56px;
+.navbar-fixed-top {
+  background: #377BAA;
+  span {
+    color:white;
+  }
+}
 
-    // Positioning context for the mobile navigation icon
-    position: relative;
+.navbar-fixed-bottom {
+  background: #377BAA;
+  h2,h6 {
+    color:white;
+  }
 }
 
 .site-title {
@@ -244,11 +249,14 @@ tr {
   align-self: center;
   vertical-align: middle;
   height: 30px;
-  &:nth-child(even) {background: #CCC}
+  &:nth-child(even) {background: #B0C4DE}
   &:nth-child(odd) {background: #FFF}
 }
 td {
   font-size: 17px;
+  @media screen and (max-width: $on-palm) {
+      font-size: 12px;
+  }
 }
 
 .header-offset {
@@ -264,6 +272,10 @@ a {
   width: 180px;
 }
 
-td.full-size-row {
-  width: 100%;
+.panel {
+  padding-bottom: 80px;
+}
+
+.btn-group-container {
+  padding: 2em 0;
 }

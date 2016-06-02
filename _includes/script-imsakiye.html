@@ -10,120 +10,84 @@
 
     $(document).ready(function() {
 
-      getCountry();
+        getCountry();
 
-      function getCountry() {
-        jQuery.ajax({
-            type: 'GET',
-            url: 'http://www.semihturan.xyz/namaz-vakitleri/countries.json',
-            data: '{ }',
-            dataType: 'json',
-            success: function(data) {
-                $.each(data.root.country, function(index, element) {
-                    $('#dropdownSelectCountry').append('<li><a class="countryItem">' + element.country + '</a></li>');
-                    $('.countryItem').click(function() {
-                        countryName = $(this).html();
-                        $('#countryButton').text(countryName);
-                        $(this).addClass('selected');
+        function getCountry() {
+            jQuery.ajax({
+                type: 'GET',
+                url: 'http://www.semihturan.xyz/namaz-vakitleri/countries.json',
+                data: '{ }',
+                dataType: 'json',
+                success: function(data) {
+                    $.each(data.root.country, function(index, element) {
+                        $('#dropdownSelectCountry').append('<li><a class="countryItem">' + element.country + '</a></li>');
+                        $('.countryItem').click(function() {
+                            countryName = $(this).html();
+                            $('#countryButton').html(countryName + '<span class="caret"></span>');
+                            $(this).addClass('selected');
+                        });
                     });
-                });
-                $('.countryItem').click(function() {
-                  $('#dropdownSelectCity').children().remove();
-                  $('#dropdownSelectCounty').children().remove();
-                  $('#cityButton').text("İl seçiniz");
-                  $('#countyButton').text("İlçe seçiniz");
-                  setCountry();
-                });
-                function setCountry() {
-                    console.log('Ulke adi: ' + countryName);
-                    for (var i = 0; i < data.root.country.length; i++) {
-                        if (data.root.country[i].country === countryName) {
-                            countryValue = data.root.country[i].value.match(/\d+/)[0];
-                            console.log('Ulke kodu: ' + countryValue);
-                            getCity();
+                    $('.countryItem').click(function() {
+                        $('#dropdownSelectCity').children().remove();
+                        $('#dropdownSelectCounty').children().remove();
+                        $('#cityButton').html('İl seçiniz <span class="caret"></span>');
+                        $('#countyButton').html('İlçe seçiniz <span class="caret"></span>');
+                        setCountry();
+                    });
+
+                    function setCountry() {
+                        console.log('Ulke adi: ' + countryName);
+                        for (var i = 0; i < data.root.country.length; i++) {
+                            if (data.root.country[i].country === countryName) {
+                                countryValue = data.root.country[i].value.match(/\d+/)[0];
+                                console.log('Ulke kodu: ' + countryValue);
+                                getCity();
+                            }
                         }
                     }
                 }
-            }
-        });
-      }
-
-        function getCity() {
-          $.ajax({
-              url: 'http://ramazan.diyanet.gov.tr/imsakiye/',
-              type: "POST",
-              data: {
-                  "ulkeId": countryValue,
-              },
-              success: function(dataReturned) {
-                console.log('success ');
-                var html = $.parseHTML(dataReturned);
-                var cities= $(html).find('#ilId').children();
-                $.each(cities, function(index, element) {
-                    cityName = cities.eq(index).html();
-                    $('#dropdownSelectCity').append('<li><a class="cityItem">' + cityName+ '</a></li>');
-                    $('.cityItem').click(function() {
-                        cityName = $(this).html();
-                        $('#cityButton').text(cityName);
-                        $(this).addClass('selected');
-                    });
-                });
-
-                  // for (var i = 0; i < cities.length; i++) {
-                  //   cityName = cities.eq(i).html();
-                  //   $('#dropdownSelectCity').append('<li><a class="cityItem">' + cityName + '</a></li>');
-                  //   console.log('Sehir adi: ' + cityName);
-                  //   $('.cityItem').click(function() {
-                  //       $('#cityButton').text(cities.eq(i).html());
-                  //   });
-                  // }
-                  $('.cityItem').click(function() {
-                      setCity();
-                  });
-
-                  function setCity() {
-                      for (var i = 0; i < cities.length; i++) {
-                          if (cities.eq(i).html() === cityName) {
-                            console.log('Sehir adi: ' + cityName);
-                              cityValue = cities.eq(i).attr("value").match(/\d+/)[0];
-                              console.log('Sehir kodu: ' + cityValue);
-                              getCounty();
-                          }
-                      }
-                  }
-              }
-          });
+            });
         }
 
+        function getCity() {
+            $.ajax({
+                url: 'http://ramazan.diyanet.gov.tr/imsakiye/',
+                type: "POST",
+                data: {
+                    "ulkeId": countryValue,
+                },
+                success: function(dataReturned) {
+                    console.log('success ');
+                    var html = $.parseHTML(dataReturned);
+                    var cities = $(html).find('#ilId').children();
+                    $.each(cities, function(index, element) {
+                        cityName = cities.eq(index).html();
+                        $('#dropdownSelectCity').append('<li><a class="cityItem">' + cityName + '</a></li>');
+                        $('.cityItem').click(function() {
+                            cityName = $(this).html();
+                            $('#cityButton').html(cityName + '<span class="caret"></span>');
+                            $(this).addClass('selected');
+                        });
+                    });
+                    $('.cityItem').click(function() {
+                        $('#dropdownSelectCounty').children().remove();
+                        $('#countyButton').html('İlçe seçiniz <span class="caret"></span>');
+                        setCity();
+                    });
 
-        // function getCity() {
-        //     $.ajax({
-        //         url: 'http://www.diyanet.gov.tr/PrayerTime/FillMainPageState?countryCode=' + parseInt(countryValue),
-        //         success: function(data) {
-        //             $.each(data, function(index, element) {
-        //                 $('#dropdownSelectCity').append('<li><a class="cityItem">' + element.Text + '</a></li>');
-        //                 $('.cityItem').click(function() {
-        //                     cityName = $(this).html();
-        //                     $('#cityButton').text(cityName);
-        //                 });
-        //             });
-        //             $('.cityItem').click(function() {
-        //                 setCity();
-        //             });
-        //
-        //             function setCity() {
-        //                 for (var i = 0; i < data.length; i++) {
-        //                     if (data[i].Text === cityName) {
-        //                       console.log('Sehir adi: ' + cityName);
-        //                         cityValue = data[i].Value.match(/\d+/)[0];
-        //                         console.log('Sehir kodu: ' + cityValue);
-        //                         getCounty();
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     });
-        // }
+                    function setCity() {
+                        for (var i = 0; i < cities.length; i++) {
+                            if (cities.eq(i).html() === cityName) {
+                                console.log('Sehir adi: ' + cityName);
+                                cityValue = cities.eq(i).attr("value").match(/\d+/)[0];
+                                console.log('Sehir kodu: ' + cityValue);
+                                getCounty();
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
         function getCounty() {
             $.ajax({
@@ -133,7 +97,7 @@
                         $('#dropdownSelectCounty').append('<li><a class="countyItem">' + element.Text + '</a></li>');
                         $('.countyItem').click(function() {
                             countyName = $(this).html();
-                            $('#countyButton').text(countyName);
+                            $('#countyButton').html(countyName + '<span class="caret"></span>');
                         });
                     });
                     $('.countyItem').click(function() {
@@ -155,7 +119,7 @@
         }
 
         function getImsakiye() {
-        $(".hidden").removeClass("hidden");
+            $(".hidden").removeClass("hidden");
             jQuery.ajax({
                 url: "http://ramazan.diyanet.gov.tr/imsakiye/",
                 type: "POST",
@@ -173,7 +137,13 @@
                     place.text(selectedPlace + cityName);
                     for (i = 2; i < 28; i++) {
                         var columns = rows.eq(i).children();
-                        rowInfo += '<td>' + (i-1) + ' Ramazan 1437</td>';
+                        rowInfo += '<td>' + (i - 1) + ' Ramazan 1437</td>';
+                        for (x = 1; x < 2; x++) {
+                            var rawText = columns.eq(x).text().split(/ +/);
+                            console.log(rawText);
+                            text = rawText[1] + ' ' + rawText[2] + ' '+ rawText[3];
+                            rowInfo += '<td>' + text + '</td>';
+                        }
                         for (x = 2; x < columns.length; x++) {
                             var text = columns.eq(x).text();
                             rowInfo += '<td>' + text + '</td>';
@@ -188,7 +158,13 @@
                     }
                     for (i = 29; i < 32; i++) {
                         var columns = rows.eq(i).children();
-                        rowInfo += '<td>' + (i-2) + ' Ramazan 1437</td>';
+                        rowInfo += '<td>' + (i - 2) + ' Ramazan 1437</td>';
+                        for (x = 1; x < 2; x++) {
+                            var rawText = columns.eq(x).text().split(/ +/);
+                            console.log(rawText);
+                            text = rawText[1] + ' ' + rawText[2] + ' '+ rawText[3];
+                            rowInfo += '<td>' + text + '</td>';
+                        }
                         for (x = 2; x < columns.length; x++) {
                             var text = columns.eq(x).text();
                             rowInfo += '<td>' + text + '</td>';
@@ -197,9 +173,9 @@
                         rowInfo = "";
                     }
                     for (i = 33; i < 34; i++) {
-                      var text = rows.eq(i).children().eq(0).html();
-                      // time.append('<tr class= "text-center" colspan=100%>' + text+ '</tr>');
-                      // rowInfo = "";
+                        var text = rows.eq(i).children().eq(0).html();
+                        // time.append('<tr class= "text-center" colspan=100%>' + text+ '</tr>');
+                        // rowInfo = "";
                     }
                 }
             });

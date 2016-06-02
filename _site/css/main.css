@@ -5812,11 +5812,15 @@ button.close {
 /**
  * Site header
  */
-.site-header {
-  border-top: 5px solid #424242;
-  border-bottom: 1px solid #e8e8e8;
-  min-height: 56px;
-  position: relative; }
+.navbar-fixed-top {
+  background: #377BAA; }
+  .navbar-fixed-top span {
+    color: white; }
+
+.navbar-fixed-bottom {
+  background: #377BAA; }
+  .navbar-fixed-bottom h2, .navbar-fixed-bottom h6 {
+    color: white; }
 
 .site-title {
   font-size: 26px;
@@ -5985,12 +5989,15 @@ tr {
   vertical-align: middle;
   height: 30px; }
   tr:nth-child(even) {
-    background: #CCC; }
+    background: #B0C4DE; }
   tr:nth-child(odd) {
     background: #FFF; }
 
 td {
   font-size: 17px; }
+  @media screen and (max-width: 600px) {
+    td {
+      font-size: 12px; } }
 
 .header-offset {
   height: 60px; }
@@ -6002,5 +6009,8 @@ a {
 .btn {
   width: 180px; }
 
-td.full-size-row {
-  width: 100%; }
+.panel {
+  padding-bottom: 80px; }
+
+.btn-group-container {
+  padding: 2em 0; }
