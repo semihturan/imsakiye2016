@@ -7,6 +7,8 @@
     var cityValue;
     var countyName;
     var countyValue;
+    var todayText;
+    var tomorrowText;
 
     $(document).ready(function() {
 
@@ -21,13 +23,13 @@
                 success: function(data) {
                     $.each(data.root.country, function(index, element) {
                         $('#dropdownSelectCountry').append('<li><a class="countryItem">' + element.country + '</a></li>');
-                        $('.countryItem').click(function() {
+                        $(document).on('click', '.countryItem', function() {
                             countryName = $(this).html();
                             $('#countryButton').html(countryName + '<span class="caret"></span>');
                             $(this).addClass('selected');
                         });
                     });
-                    $('.countryItem').click(function() {
+                    $(document).on('click', '.countryItem', function() {
                         $('#dropdownSelectCity').children().remove();
                         $('#dropdownSelectCounty').children().remove();
                         $('#cityButton').html('İl seçiniz <span class="caret"></span>');
@@ -63,13 +65,13 @@
                     $.each(cities, function(index, element) {
                         cityName = cities.eq(index).html();
                         $('#dropdownSelectCity').append('<li><a class="cityItem">' + cityName + '</a></li>');
-                        $('.cityItem').click(function() {
+                        $(document).on('click', '.cityItem', function() {
                             cityName = $(this).html();
                             $('#cityButton').html(cityName + '<span class="caret"></span>');
                             $(this).addClass('selected');
                         });
                     });
-                    $('.cityItem').click(function() {
+                    $(document).on('click', '.cityItem', function() {
                         $('#dropdownSelectCounty').children().remove();
                         $('#countyButton').html('İlçe seçiniz <span class="caret"></span>');
                         setCity();
@@ -95,12 +97,12 @@
                 success: function(data) {
                     $.each(data, function(index, element) {
                         $('#dropdownSelectCounty').append('<li><a class="countyItem">' + element.Text + '</a></li>');
-                        $('.countyItem').click(function() {
+                        $(document).on('click', '.countyItem', function() {
                             countyName = $(this).html();
                             $('#countyButton').html(countyName + '<span class="caret"></span>');
                         });
                     });
-                    $('.countyItem').click(function() {
+                    $(document).on('click', '.countyItem', function() {
                         setCounty();
                     });
 
@@ -110,12 +112,29 @@
                             if (data[i].Text === countyName) {
                                 countyValue = data[i].Value.match(/\d+/)[0];
                                 console.log('Ilce kodu: ' + countyValue);
-                                getImsakiye();
+                                getDate();
                             }
                         }
                     }
                 }
             });
+        }
+
+        function getDate() {
+          var monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran","Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+          var todayDate = new Date();
+          var todayDay = todayDate.getUTCDate();
+          var todayMonth = monthNames[todayDate.getMonth()];
+          var todayYear = todayDate.getFullYear();
+          todayText = todayDay + ' ' + todayMonth + ' '+ todayYear;
+
+          var tomorrowDate = new Date();
+          tomorrowDate.setDate(todayDate.getDate()+1);
+          var tomorrowDay = tomorrowDate.getUTCDate();
+          var tomorrowMonth = monthNames[tomorrowDate.getMonth()];
+          var tomorrowYear = tomorrowDate.getFullYear();
+          tomorrowText = tomorrowDay + ' ' + tomorrowMonth + ' '+ tomorrowYear;
+          getImsakiye();
         }
 
         function getImsakiye() {
@@ -133,22 +152,31 @@
                     time.children().remove();
                     var rows = jQuery(data).find("#table").children().children();
                     var rowInfo;
+                    var dateText;
+                    var dateTextTomorrow;
                     selectedPlace = rows.eq(0).children().eq(0).text().split("İmsakiye");
                     place.text(selectedPlace + cityName);
+                    rowInfo = '<tr class="table-header"><td>Hicri Tarih</td><td>Miladi Tarih</td><td>İmsak</td><td>Sabah</td><td>Öğle</td><td>İkindi</td><td>Akşam</td><td>Yatsı</td></tr>'
                     for (i = 2; i < 28; i++) {
                         var columns = rows.eq(i).children();
                         rowInfo += '<td>' + (i - 1) + ' Ramazan 1437</td>';
                         for (x = 1; x < 2; x++) {
                             var rawText = columns.eq(x).text().split(/ +/);
-                            console.log(rawText);
-                            text = rawText[1] + ' ' + rawText[2] + ' '+ rawText[3];
-                            rowInfo += '<td>' + text + '</td>';
+                            dateText = rawText[1] + ' ' + rawText[2] + ' '+ rawText[3];
+                            rowInfo += '<td>' + dateText + '</td>';
                         }
                         for (x = 2; x < columns.length; x++) {
                             var text = columns.eq(x).text();
                             rowInfo += '<td>' + text + '</td>';
                         }
-                        time.append('<tr>' + rowInfo + '</tr>');
+                        if(dateText==todayText) {
+                          time.append('<tr class="date-today">' + rowInfo + '</tr>');
+                        } else if (dateText==tomorrowText) {
+                          time.append('<tr class="date-tomorrow">' + rowInfo + '</tr>');
+                        }
+                        else {
+                          time.append('<tr>' + rowInfo + '</tr>');
+                        }
                         rowInfo = "";
                     }
                     for (i = 28; i < 29; i++) {
@@ -162,14 +190,21 @@
                         for (x = 1; x < 2; x++) {
                             var rawText = columns.eq(x).text().split(/ +/);
                             console.log(rawText);
-                            text = rawText[1] + ' ' + rawText[2] + ' '+ rawText[3];
-                            rowInfo += '<td>' + text + '</td>';
+                            dateText = rawText[1] + ' ' + rawText[2] + ' '+ rawText[3];
+                            rowInfo += '<td>' + dateText + '</td>';
                         }
                         for (x = 2; x < columns.length; x++) {
                             var text = columns.eq(x).text();
                             rowInfo += '<td>' + text + '</td>';
                         }
-                        time.append('<tr>' + rowInfo + '</tr>');
+                        if(dateText==todayText) {
+                          time.append('<tr class="date-today">' + rowInfo + '</tr>');
+                        } else if (dateText==tomorrowText) {
+                          time.append('<tr class="date-tomorrow">' + rowInfo + '</tr>');
+                        }
+                        else {
+                          time.append('<tr>' + rowInfo + '</tr>');
+                        }
                         rowInfo = "";
                     }
                     for (i = 33; i < 34; i++) {
@@ -177,8 +212,56 @@
                         // time.append('<tr class= "text-center" colspan=100%>' + text+ '</tr>');
                         // rowInfo = "";
                     }
+
+                    var date = new Date();
+                    var currentHour =date.getHours() * 60 * 60;
+                    var currentMinute =date.getMinutes() * 60;
+                    var currentSecond = date.getSeconds();
+                    var currentTime = currentHour+currentMinute+currentSecond;
+
+                    var aksamHour = parseInt($('.date-today').children().eq(6).text().split(':')[0]) * 60;
+                    var aksamMinute = parseInt($('.date-today').children().eq(6).text().split(':')[1]);
+                    var aksamTime = (aksamHour+aksamMinute) * 60;
+
+                    var imsakHour = parseInt($('.date-tomorrow').children().eq(2).text().split(':')[0]) * 60;
+                    var imsakMinute = parseInt($('.date-tomorrow').children().eq(2).text().split(':')[1]);
+                    var imsakTime = (imsakHour+imsakMinute) * 60;
+
+                    var timeRemaining;
+
+                    if(aksamTime>=currentTime) {
+                      timeRemaining = (aksamTime-currentTime);
+                      state = "İftara kalan süre";
+                    } else {
+                      timeRemaining = (86400 - currentTime + imsakTime);
+                      state = "İmsaka kalan süre";
+                    }
+                    display = $('#counter');
+                    startTimer(timeRemaining, state, display);
                 }
             });
         }
+
+        function startTimer(duration, state, display) {
+            var timer = duration, hours, minutes, seconds;
+            setInterval(function () {
+                hours = parseInt(timer / 3600, 10);
+                minutes = parseInt(timer % 3600 / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                hours = hours < 10 ? "0" + hours : hours;
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.html('<h2>' + state + '</h2><h3>' + hours + ':' + minutes + ':' + seconds + '</h3>');
+
+                if (--timer < 0) {
+                    timer = duration;
+                }
+            }, 1000);
+        }
+
+        jQuery(function ($) {
+        });
     });
 </script>
