@@ -5837,7 +5837,7 @@ td {
     td {
       font-size: 12px; } }
 
-.date-today > * {
+.date-today > *, .kadir-gecesi {
   background: #191970;
   color: white; }
 
